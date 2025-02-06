@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Request
 from pymongo.results import InsertOneResult
-
+from bson import ObjectId
 from src.app import app, mongo_client
 from src.models import User
 
@@ -19,7 +19,7 @@ async def _fetch_user(*, email: str, password: str) -> User:
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    user["id"] = str(user["_id"])
+    user["password"] = "HIDDEN FOR SECURITY REASONS"
     return User.model_validate(user)
 
 
@@ -44,14 +44,26 @@ async def fetch_user(request: Request, email: str, password: str) -> User:
     return await _fetch_user(email=email, password=password)
 
 
+@router.get("/fetch/{_id}")
+async def fetch_user_by_id(request: Request, _id: str) -> User:
+    collection = mongo_client["MomCare"]["users"]
+    user = await collection.find_one({"_id": ObjectId(_id)}, {"password": 0})
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return User.model_validate(user)
+
 @router.put("/update")
 async def update_user(
     request: Request, email: str, password: str, update_criteria: dict
 ):
     collection = mongo_client["MomCare"]["users"]
-    result = await collection.update_one(
-        {"email_address": email, "password": password}, update_criteria
-    )
+    try:
+        result = await collection.update_one(
+            {"email_address": email, "password": password}, update_criteria
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     return {"success": True, "modified_count": result.modified_count}
 

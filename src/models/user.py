@@ -40,7 +40,7 @@ class User(BaseModel):
     medical_data: Optional[UserMedical]
     mood: Optional[MoodType]
 
-    exercise: List[Exercise] = []
+    exercises: List[Exercise] = []
     plan: Optional[MyPlan]
 
     history: List[History] = []
