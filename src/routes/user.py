@@ -60,3 +60,6 @@ async def update_user(
     )
 
     return {"success": True, "modified_count": result.modified_count}
+
+
+app.include_router(router)
