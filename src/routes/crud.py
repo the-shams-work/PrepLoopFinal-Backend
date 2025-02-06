@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
+import os
 
 from bson import ObjectId
-from fastapi import Request
+from fastapi import Request, Depends, HTTPException
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+import secrets
 
 from src.app import app, mongo_client
 
@@ -15,8 +18,6 @@ if TYPE_CHECKING:
         DeleteResult,
     )
     from type import MongoCollection
-
-from fastapi import HTTPException
 
 __all__ = (
     "find_one",
@@ -30,6 +31,19 @@ __all__ = (
     "replace_one",
 )
 
+ADMIN_USERNAME = os.environ["ADMIN_USERNAME"]
+ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
+
+security = HTTPBasic()
+
+async def validate_credentials(credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, ADMIN_USERNAME)
+    correct_password = secrets.compare_digest(credentials.password, ADMIN_PASSWORD)
+
+    if not (correct_username and correct_password):
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
+
+    return credentials.username
 
 async def get_query_params(request: Request):
     if request.method == "GET":
@@ -201,53 +215,53 @@ async def handle_request(collection_name: str, request: Request, operation: str)
 
 @app.get("/collection/{collection_name}/find-one")
 @app.post("/collection/{collection_name}/find-one")
-async def find_one(collection_name: str, request: Request):
+async def find_one(collection_name: str, request: Request, credentials: HTTPBasicCredentials = Depends(validate_credentials)):
     return await handle_request(collection_name, request, "find_one")
 
 
 @app.get("/collection/{collection_name}/find-all")
 @app.post("/collection/{collection_name}/find-all")
-async def find_all(collection_name: str, request: Request):
+async def find_all(collection_name: str, request: Request, credentials: HTTPBasicCredentials = Depends(validate_credentials)):
     return await handle_request(collection_name, request, "find_all")
 
 
 @app.get("/collection/{collection_name}/insert-one")
 @app.put("/collection/{collection_name}/insert-one")
-async def insert_one(collection_name: str, request: Request):
+async def insert_one(collection_name: str, request: Request, credentials: HTTPBasicCredentials = Depends(validate_credentials)):
     return await handle_request(collection_name, request, "insert_one")
 
 
 @app.get("/collection/{collection_name}/insert-many")
 @app.put("/collection/{collection_name}/insert-many")
-async def insert_many(collection_name: str, request: Request):
+async def insert_many(collection_name: str, request: Request, credentials: HTTPBasicCredentials = Depends(validate_credentials)):
     return await handle_request(collection_name, request, "insert_many")
 
 
 @app.get("/collection/{collection_name}/update")
 @app.put("/collection/{collection_name}/update")
-async def update(collection_name: str, request: Request):
+async def update(collection_name: str, request: Request, credentials: HTTPBasicCredentials = Depends(validate_credentials)):
     return await handle_request(collection_name, request, "update")
 
 
 @app.get("/collection/{collection_name}/update-many")
 @app.put("/collection/{collection_name}/update-many")
-async def update_many(collection_name: str, request: Request):
+async def update_many(collection_name: str, request: Request, credentials: HTTPBasicCredentials = Depends(validate_credentials)):
     return await handle_request(collection_name, request, "update_many")
 
 
 @app.get("/collection/{collection_name}/delete-one")
 @app.delete("/collection/{collection_name}/delete-one")
-async def delete_one(collection_name: str, request: Request):
+async def delete_one(collection_name: str, request: Request, credentials: HTTPBasicCredentials = Depends(validate_credentials)):
     return await handle_request(collection_name, request, "delete_one")
 
 
 @app.get("/collection/{collection_name}/delete-many")
 @app.delete("/collection/{collection_name}/delete-many")
-async def delete_many(collection_name: str, request: Request):
+async def delete_many(collection_name: str, request: Request, credentials: HTTPBasicCredentials = Depends(validate_credentials)):
     return await handle_request(collection_name, request, "delete_many")
 
 
 @app.get("/collection/{collection_name}/replace-one")
 @app.put("/collection/{collection_name}/replace-one")
-async def replace_one(collection_name: str, request: Request):
+async def replace_one(collection_name: str, request: Request, credentials: HTTPBasicCredentials = Depends(validate_credentials)):
     return await handle_request(collection_name, request, "replace_one")
