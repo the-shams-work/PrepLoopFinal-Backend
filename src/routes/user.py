@@ -14,7 +14,7 @@ router = APIRouter(prefix="/user", tags=["User"])
 async def _fetch_user(*, email: str, password: str) -> User:
     collection = mongo_client["MomCare"]["users"]
     user = await collection.find_one(
-        {"email_address": email, "password": password}, {"password": 0, "_id": 0}
+        {"email_address": email, "password": password}, {"password": 0}
     )
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -40,9 +40,8 @@ async def create_user(request: Request, data: User):
 
 
 @router.get("/fetch")
-async def fetch_user(request: Request, email: str, password: str):
-    user = await _fetch_user(email=email, password=password)
-    return {"success": True, "user": dict(user)}
+async def fetch_user(request: Request, email: str, password: str) -> User:
+    return await _fetch_user(email=email, password=password)
 
 
 @router.put("/update")

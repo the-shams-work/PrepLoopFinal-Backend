@@ -216,7 +216,6 @@ async def handle_request(collection_name: str, request: Request, operation: str)
         return {"success": False, "message": str(e)}
 
 
-@app.get("/collection/{collection_name}/find-one")
 @app.post("/collection/{collection_name}/find-one")
 async def find_one(
     collection_name: str,
@@ -226,7 +225,6 @@ async def find_one(
     return await handle_request(collection_name, request, "find_one")
 
 
-@app.get("/collection/{collection_name}/find-all")
 @app.post("/collection/{collection_name}/find-all")
 async def find_all(
     collection_name: str,
@@ -236,7 +234,6 @@ async def find_all(
     return await handle_request(collection_name, request, "find_all")
 
 
-@app.get("/collection/{collection_name}/insert-one")
 @app.put("/collection/{collection_name}/insert-one")
 async def insert_one(
     collection_name: str,
@@ -246,7 +243,6 @@ async def insert_one(
     return await handle_request(collection_name, request, "insert_one")
 
 
-@app.get("/collection/{collection_name}/insert-many")
 @app.put("/collection/{collection_name}/insert-many")
 async def insert_many(
     collection_name: str,
@@ -256,7 +252,6 @@ async def insert_many(
     return await handle_request(collection_name, request, "insert_many")
 
 
-@app.get("/collection/{collection_name}/update")
 @app.put("/collection/{collection_name}/update")
 async def update(
     collection_name: str,
@@ -266,7 +261,6 @@ async def update(
     return await handle_request(collection_name, request, "update")
 
 
-@app.get("/collection/{collection_name}/update-many")
 @app.put("/collection/{collection_name}/update-many")
 async def update_many(
     collection_name: str,
@@ -276,7 +270,6 @@ async def update_many(
     return await handle_request(collection_name, request, "update_many")
 
 
-@app.get("/collection/{collection_name}/delete-one")
 @app.delete("/collection/{collection_name}/delete-one")
 async def delete_one(
     collection_name: str,
@@ -286,7 +279,6 @@ async def delete_one(
     return await handle_request(collection_name, request, "delete_one")
 
 
-@app.get("/collection/{collection_name}/delete-many")
 @app.delete("/collection/{collection_name}/delete-many")
 async def delete_many(
     collection_name: str,
@@ -296,7 +288,6 @@ async def delete_many(
     return await handle_request(collection_name, request, "delete_many")
 
 
-@app.get("/collection/{collection_name}/replace-one")
 @app.put("/collection/{collection_name}/replace-one")
 async def replace_one(
     collection_name: str,
