@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from bson import ObjectId
 from fastapi import Request
 
 from src.app import app, mongo_client
-
-from typing import Any
 
 if TYPE_CHECKING:
     from pymongo.results import (

@@ -57,4 +57,3 @@ class UserMedical(BaseModel):
     pre_existing_conditions: list[PreExistingCondition] = []
     food_intolerances: list[Intolerance] = []
     dietary_preferences: list[DietaryPreference] = []
-

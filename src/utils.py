@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import base64
+
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
-import base64
 
 with open("public.pem", "rb") as f:
     public_key = RSA.import_key(f.read())
