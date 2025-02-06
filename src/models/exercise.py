@@ -15,7 +15,7 @@ class Exercise(BaseModel):
     duration: float
     description: str
 
-    tags: List[str]
+    tags: List[str] = []
     level: DifficultyType = DifficultyType.BEGINNER
 
     exercise_image_name: str

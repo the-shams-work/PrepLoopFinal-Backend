@@ -37,15 +37,15 @@ class User(BaseModel):
 
     phone_number: str
 
-    medical_data: Optional[UserMedical]
-    mood: Optional[MoodType]
+    medical_data: Optional[UserMedical] = None
+    mood: Optional[MoodType] = None
 
     exercises: List[Exercise] = []
-    plan: Optional[MyPlan]
+    plan: Optional[MyPlan] = None
 
     history: List[History] = []
 
-    created_at: datetime
+    created_at: datetime = datetime.now()
     updated_at: Optional[datetime] = None
 
 
@@ -55,7 +55,7 @@ class UserMedical(BaseModel):
     pre_pregnancy_weight: float
     current_weight: float
 
-    due_date: Optional[datetime]
+    due_date: Optional[datetime] = None
     pre_existing_conditions: List[PreExistingCondition] = []
     food_intolerances: List[Intolerance] = []
     dietary_preferences: List[DietaryPreference] = []

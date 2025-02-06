@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Request
 from pymongo.results import InsertOneResult
-from bson import ObjectId
+
 from src.app import app, mongo_client
 from src.models import User
 
@@ -29,7 +30,7 @@ async def user_exists(*, email: str) -> bool:
 
 
 @router.post("/create")
-async def create_user(request: Request, data: User):
+async def create_user(request: Request, data: User) -> dict:
     if await user_exists(email=data.email_address):
         raise HTTPException(status_code=400, detail="User already exists")
 
@@ -52,6 +53,7 @@ async def fetch_user_by_id(request: Request, _id: str) -> User:
         raise HTTPException(status_code=404, detail="User not found")
 
     return User.model_validate(user)
+
 
 @router.put("/update")
 async def update_user(

@@ -8,10 +8,10 @@ __all__ = ("MyPlan",)
 
 
 class MyPlan(BaseModel):
-    calories_goal: Optional[int]
-    protein_goal: Optional[int]
-    carbs_goal: Optional[int]
-    fat_goal: Optional[int]
+    calories_goal: Optional[int] = 0
+    protein_goal: Optional[int] = 0
+    carbs_goal: Optional[int] = 0
+    fat_goal: Optional[int] = 0
 
     current_calories_intake: int = 0
     current_protein_intake: int = 0
