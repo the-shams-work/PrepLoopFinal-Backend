@@ -5,7 +5,7 @@ import secrets
 from typing import TYPE_CHECKING, Any
 
 from bson import ObjectId
-from fastapi import Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 from src.app import app, mongo_client
@@ -36,6 +36,8 @@ ADMIN_USERNAME = os.environ["ADMIN_USERNAME"]
 ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 
 security = HTTPBasic()
+
+router = APIRouter(prefix="/collection", tags=["CRUD"])
 
 
 def validate_credentials(credentials: HTTPBasicCredentials = Depends(security)):
@@ -216,7 +218,7 @@ async def handle_request(collection_name: str, request: Request, operation: str)
         return {"success": False, "message": str(e)}
 
 
-@app.post("/collection/{collection_name}/find-one")
+@router.post("/{collection_name}/find-one")
 async def find_one(
     collection_name: str,
     request: Request,
@@ -225,7 +227,7 @@ async def find_one(
     return await handle_request(collection_name, request, "find_one")
 
 
-@app.post("/collection/{collection_name}/find-all")
+@router.post("/{collection_name}/find-all")
 async def find_all(
     collection_name: str,
     request: Request,
@@ -234,7 +236,7 @@ async def find_all(
     return await handle_request(collection_name, request, "find_all")
 
 
-@app.put("/collection/{collection_name}/insert-one")
+@router.put("/{collection_name}/insert-one")
 async def insert_one(
     collection_name: str,
     request: Request,
@@ -243,7 +245,7 @@ async def insert_one(
     return await handle_request(collection_name, request, "insert_one")
 
 
-@app.put("/collection/{collection_name}/insert-many")
+@router.put("/{collection_name}/insert-many")
 async def insert_many(
     collection_name: str,
     request: Request,
@@ -252,7 +254,7 @@ async def insert_many(
     return await handle_request(collection_name, request, "insert_many")
 
 
-@app.put("/collection/{collection_name}/update")
+@router.put("/{collection_name}/update")
 async def update(
     collection_name: str,
     request: Request,
@@ -261,7 +263,7 @@ async def update(
     return await handle_request(collection_name, request, "update")
 
 
-@app.put("/collection/{collection_name}/update-many")
+@router.put("/{collection_name}/update-many")
 async def update_many(
     collection_name: str,
     request: Request,
@@ -270,7 +272,7 @@ async def update_many(
     return await handle_request(collection_name, request, "update_many")
 
 
-@app.delete("/collection/{collection_name}/delete-one")
+@router.delete("/{collection_name}/delete-one")
 async def delete_one(
     collection_name: str,
     request: Request,
@@ -279,7 +281,7 @@ async def delete_one(
     return await handle_request(collection_name, request, "delete_one")
 
 
-@app.delete("/collection/{collection_name}/delete-many")
+@router.delete("/{collection_name}/delete-many")
 async def delete_many(
     collection_name: str,
     request: Request,
@@ -288,10 +290,13 @@ async def delete_many(
     return await handle_request(collection_name, request, "delete_many")
 
 
-@app.put("/collection/{collection_name}/replace-one")
+@router.put("/{collection_name}/replace-one")
 async def replace_one(
     collection_name: str,
     request: Request,
     credentials: HTTPBasicCredentials = Depends(validate_credentials),
 ):
     return await handle_request(collection_name, request, "replace_one")
+
+
+app.include_router(router)
