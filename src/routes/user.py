@@ -51,7 +51,9 @@ async def fetch_user(request: Request, email: str, password: str):
 
 
 @router.put("/update")
-async def update_user(request: Request, email: str, password: str, update_criteria: dict):
+async def update_user(
+    request: Request, email: str, password: str, update_criteria: dict
+):
     collection = mongo_client["MomCare"]["users"]
     result = await collection.update_one(
         {"email_address": email, "password": password}, update_criteria
