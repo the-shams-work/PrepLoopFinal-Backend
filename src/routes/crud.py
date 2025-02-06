@@ -211,7 +211,7 @@ async def handle_request(collection_name: str, request: Request, operation: str)
         if operation_func:
             return await operation_func(collection, query)
         else:
-            return {"success": False, "message": "Invalid operation"}
+            RuntimeError("Invalid operation")
     except Exception as e:
         return {"success": False, "message": str(e)}
 

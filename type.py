@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import AsyncIterator, Iterable, Mapping, MutableMapping, Sequence
-from typing import TYPE_CHECKING, Any, Generic, TypedDict, Union, overload
+from typing import TYPE_CHECKING, Any, Generic, Union
 
 from bson.codec_options import CodecOptions
 from bson.raw_bson import RawBSONDocument
@@ -9,7 +9,7 @@ from pymongo import MongoClient, WriteConcern
 from pymongo.client_session import ClientSession
 from pymongo.collection import Collection, ReturnDocument
 from pymongo.command_cursor import CommandCursor
-from pymongo.cursor import Cursor, RawBatchCursor
+from pymongo.cursor import RawBatchCursor
 from pymongo.database import Database
 from pymongo.operations import (
     DeleteMany,
@@ -42,7 +42,7 @@ _WriteOp = Union[  # noqa: UP007
 ]
 
 if TYPE_CHECKING:
-    from typing_extensions import NotRequired
+    pass
 
 
 class AsyncMongoClient(MongoClient, Generic[_DocumentType]):

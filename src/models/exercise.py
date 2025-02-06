@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import List
+
 from pydantic import BaseModel
 
 from .enums import DifficultyType, ExerciseType
@@ -13,7 +15,7 @@ class Exercise(BaseModel):
     duration: float
     description: str
 
-    tags: list[str]
+    tags: List[str]
     level: DifficultyType = DifficultyType.BEGINNER
 
     exercise_image_name: str

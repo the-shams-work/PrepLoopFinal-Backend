@@ -18,4 +18,4 @@ database = mongo_client["MomCare"]
 
 app = FastAPI()
 
-from .routes import *  # noqa: F401, F403
+from .routes import *  # noqa: E402, F401, F403

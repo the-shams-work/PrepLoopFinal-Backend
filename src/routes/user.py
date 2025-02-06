@@ -1,15 +1,10 @@
 from __future__ import annotations
 
-from datetime import datetime
-from time import perf_counter
-from typing import TYPE_CHECKING
-
 from fastapi import APIRouter, HTTPException, Request
 from pymongo.results import InsertOneResult
 
 from src.app import app, mongo_client
 from src.models import User
-from type import MongoCollection
 
 __all__ = ("create_user", "update_user", "fetch_user")
 

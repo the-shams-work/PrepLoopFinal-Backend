@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -20,7 +21,7 @@ __all__ = ("User", "UserMedical", "History")
 class History(BaseModel):
     date: datetime
     plan: MyPlan
-    exercise: list[Exercise]
+    exercise: List[Exercise]
 
 
 class User(BaseModel):
@@ -36,15 +37,15 @@ class User(BaseModel):
 
     phone_number: str
 
-    mood: MoodType | None
+    mood: Optional[MoodType]
 
-    exercise: list[Exercise] = []
-    plan: MyPlan | None
+    exercise: List[Exercise] = []
+    plan: Optional[MyPlan]
 
-    history: list[History] = []
+    history: List[History] = []
 
     created_at: datetime
-    updated_at: datetime | None = None
+    updated_at: Optional[datetime] = None
 
 
 class UserMedical(BaseModel):
@@ -53,7 +54,7 @@ class UserMedical(BaseModel):
     pre_pregnancy_weight: float
     current_weight: float
 
-    due_date: datetime | None
-    pre_existing_conditions: list[PreExistingCondition] = []
-    food_intolerances: list[Intolerance] = []
-    dietary_preferences: list[DietaryPreference] = []
+    due_date: Optional[datetime]
+    pre_existing_conditions: List[PreExistingCondition] = []
+    food_intolerances: List[Intolerance] = []
+    dietary_preferences: List[DietaryPreference] = []

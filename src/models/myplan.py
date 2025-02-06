@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+from typing import Optional
+
 from pydantic import BaseModel
 
 __all__ = ("MyPlan",)
 
 
 class MyPlan(BaseModel):
-    calories_goal: int | None
-    protein_goal: int | None
-    carbs_goal: int | None
-    fat_goal: int | None
+    calories_goal: Optional[int]
+    protein_goal: Optional[int]
+    carbs_goal: Optional[int]
+    fat_goal: Optional[int]
 
     current_calories_intake: int = 0
     current_protein_intake: int = 0
