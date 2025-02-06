@@ -37,6 +37,7 @@ class User(BaseModel):
 
     phone_number: str
 
+    medical_data: Optional[UserMedical]
     mood: Optional[MoodType]
 
     exercise: List[Exercise] = []
