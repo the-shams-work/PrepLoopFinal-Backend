@@ -4,7 +4,7 @@ from time import perf_counter
 
 from src.app import app, mongo_client
 
-__all__ = ("ping",)
+__all__ = ("ping", "root")
 
 
 @app.get("/ping")

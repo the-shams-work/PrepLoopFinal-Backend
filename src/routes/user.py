@@ -11,12 +11,12 @@ from src.app import app, mongo_client
 from src.models import User
 from type import MongoCollection
 
-__all__ = ("create_user", "update_user", "get_user")
+__all__ = ("create_user", "update_user", "fetch_user")
 
 router = APIRouter(prefix="/user", tags=["User"])
 
 
-async def fetch_user(*, email: str, password: str) -> User:
+async def _fetch_user(*, email: str, password: str) -> User:
     collection = mongo_client["MomCare"]["users"]
     user = await collection.find_one(
         {"email_address": email, "password": password}, {"password": 0, "_id": 0}
@@ -45,15 +45,13 @@ async def create_user(request: Request, data: User):
 
 
 @router.get("/fetch")
-async def get_user(request: Request, email: str, password: str):
-    user = await fetch_user(email=email, password=password)
+async def fetch_user(request: Request, email: str, password: str):
+    user = await _fetch_user(email=email, password=password)
     return {"success": True, "user": dict(user)}
 
 
 @router.put("/update")
 async def update_user(request: Request, email: str, password: str, update_criteria: dict):
-    user = await fetch_user(email=email, password=password)
-
     collection = mongo_client["MomCare"]["users"]
     result = await collection.update_one(
         {"email_address": email, "password": password}, update_criteria
