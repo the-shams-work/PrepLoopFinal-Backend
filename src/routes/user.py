@@ -35,6 +35,7 @@ async def create_user(request: Request, data: User) -> dict:
         raise HTTPException(status_code=400, detail="User already exists")
 
     collection = mongo_client["MomCare"]["users"]
+    sendable_data = data.model_dump(mode="json")
     result: InsertOneResult = await collection.insert_one(dict(data))
 
     return {"success": True, "inserted_id": str(result.inserted_id)}
