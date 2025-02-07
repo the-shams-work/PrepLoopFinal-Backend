@@ -36,7 +36,7 @@ async def create_user(request: Request, data: User) -> dict:
 
     collection = mongo_client["MomCare"]["users"]
     sendable_data = data.model_dump(mode="json")
-    result: InsertOneResult = await collection.insert_one(dict(data))
+    result: InsertOneResult = await collection.insert_one(sendable_data)
 
     return {"success": True, "inserted_id": str(result.inserted_id)}
 
