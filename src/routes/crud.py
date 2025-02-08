@@ -299,4 +299,4 @@ async def replace_one(
     return await handle_request(collection_name, request, "replace_one")
 
 
-app.include_router(router)
+app.include_router(router, include_in_schema=False)

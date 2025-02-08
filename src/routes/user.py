@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Request
+from pydantic import BaseModel
 from pymongo.results import InsertOneResult
 
 from src.app import app, mongo_client
@@ -10,6 +11,16 @@ from src.models import User
 __all__ = ("create_user", "update_user", "fetch_user")
 
 router = APIRouter(prefix="/user", tags=["User"])
+
+
+class CreateResponse(BaseModel):
+    success: bool
+    inserted_id: str
+
+
+class UpdateResponse(BaseModel):
+    success: bool
+    modified_count: int
 
 
 async def _fetch_user(*, email: str, password: str) -> User:
@@ -29,8 +40,15 @@ async def user_exists(*, email: str) -> bool:
     return await collection.count_documents({"email_address": email}) > 0
 
 
-@router.post("/create")
-async def create_user(request: Request, data: User) -> dict:
+@router.post(
+    "/create",
+    response_model=CreateResponse,
+    responses={400: {"description": "User already exists"}, 422: {}},
+)
+async def create_user(request: Request, data: User) -> CreateResponse:
+    """
+    Create a new user and return the inserted ID.
+    """
     if await user_exists(email=data.email_address):
         raise HTTPException(status_code=400, detail="User already exists")
 
@@ -38,16 +56,31 @@ async def create_user(request: Request, data: User) -> dict:
     sendable_data = data.model_dump(mode="json")
     result: InsertOneResult = await collection.insert_one(sendable_data)
 
-    return {"success": True, "inserted_id": str(result.inserted_id)}
+    response = {"success": True, "inserted_id": str(result.inserted_id)}
+    return CreateResponse(**response)
 
 
-@router.get("/fetch")
+@router.get(
+    "/fetch",
+    response_model=User,
+    responses={404: {"description": "User not found"}, 422: {}},
+)
 async def fetch_user(request: Request, email: str, password: str) -> User:
+    """
+    Fetch user details using email and password.
+    """
     return await _fetch_user(email=email, password=password)
 
 
-@router.get("/fetch/{_id}")
+@router.get(
+    "/fetch/{_id}",
+    response_model=User,
+    responses={404: {"description": "User not found"}, 422: {}},
+)
 async def fetch_user_by_id(request: Request, _id: str) -> User:
+    """
+    Fetch user details using the user ID.
+    """
     collection = mongo_client["MomCare"]["users"]
     user = await collection.find_one({"_id": ObjectId(_id)}, {"password": 0})
     if user is None:
@@ -56,19 +89,34 @@ async def fetch_user_by_id(request: Request, _id: str) -> User:
     return User.model_validate(user)
 
 
-@router.put("/update")
+@router.put(
+    "/update",
+    response_model=UpdateResponse,
+    responses={
+        400: {"description": "Invalid update operation"},
+        404: {"description": "User not found"},
+        422: {},
+    },
+)
 async def update_user(
-    request: Request, email: str, password: str, update_criteria: dict
-):
+    request: Request, email: str, password: str, updated_user: User
+) -> UpdateResponse:
+    """
+    Update user details based on email and password authentication.
+    """
     collection = mongo_client["MomCare"]["users"]
     try:
         result = await collection.update_one(
-            {"email_address": email, "password": password}, update_criteria
+            {"email_address": email, "password": password}, {"$set": dict(updated_user)}
         )
+        if result.modified_count == 0:
+            raise HTTPException(
+                status_code=404, detail="User not found or no changes applied"
+            )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    return {"success": True, "modified_count": result.modified_count}
+    return UpdateResponse(success=True, modified_count=result.modified_count)
 
 
 app.include_router(router)

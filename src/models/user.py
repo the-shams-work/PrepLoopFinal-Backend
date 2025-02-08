@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
 
 from .enums import (
     Country,
@@ -19,43 +19,64 @@ __all__ = ("User", "UserMedical", "History")
 
 
 class History(BaseModel):
-    date: datetime
-    plan: MyPlan
-    exercise: List[Exercise]
+    date: datetime = Field(
+        default_factory=datetime.utcnow, title="Date", description="Date of record"
+    )
+    plan: Optional["MyPlan"] = Field(
+        None, title="Plan", description="User's assigned plan"
+    )
+    exercise: List[Exercise] = Field(
+        default_factory=list,
+        title="Exercises",
+        description="List of completed exercises",
+    )
 
 
 class User(BaseModel):
-    id: str
-    first_name: str
-    last_name: str
+    id: str = Field(..., title="User ID")
+    first_name: str = Field(..., title="First Name", description="User's first name")
+    last_name: str = Field(
+        ..., title="Last Name", description="User's last name (surname)"
+    )
+    email_address: EmailStr = Field(
+        ..., title="Email Address", description="User's email address"
+    )
+    password: str = Field(
+        ..., title="Password (Hashed)", description="User's hashed password"
+    )
 
-    email_address: str
-    password: str
+    country_code: str = Field(default="+91", title="Country Code")
+    country: Country = Field(default=Country.INDIA, title="Country")
 
-    country_code: str = "+91"
-    country: Country = Country.INDIA
+    phone_number: str = Field(
+        ..., title="Phone Number", description="Phone number without country code"
+    )
 
-    phone_number: str
+    medical_data: Optional[UserMedical] = Field(..., title="Medical Data")
+    mood: Optional[MoodType] = Field(..., title="Mood")
 
-    medical_data: Optional[UserMedical] = None
-    mood: Optional[MoodType] = None
+    exercises: List[Exercise] = Field(default_factory=list, title="Active Exercises")
+    plan: Optional["MyPlan"] = Field(..., title="Current Plan")
+    history: List[History] = Field(default_factory=list, title="Exercise History")
 
-    exercises: List[Exercise] = []
-    plan: Optional[MyPlan] = None
-
-    history: List[History] = []
-
-    created_at: datetime = datetime.now()
-    updated_at: Optional[datetime] = None
+    created_at: datetime = Field(
+        default_factory=datetime.utcnow, title="Account Creation Date"
+    )
+    updated_at: Optional[datetime] = Field(..., title="Last Update Date")
 
 
 class UserMedical(BaseModel):
-    date_of_birth: datetime
-    height: float
-    pre_pregnancy_weight: float
-    current_weight: float
-
-    due_date: Optional[datetime] = None
-    pre_existing_conditions: List[PreExistingCondition] = []
-    food_intolerances: List[Intolerance] = []
-    dietary_preferences: List[DietaryPreference] = []
+    date_of_birth: datetime = Field(..., title="Date of Birth")
+    height: float = Field(..., gt=0, title="Height (cm)")
+    pre_pregnancy_weight: float = Field(..., gt=0, title="Pre-pregnancy Weight (kg)")
+    current_weight: float = Field(..., gt=0, title="Current Weight (kg)")
+    due_date: Optional[datetime] = Field(..., title="Due Date")
+    pre_existing_conditions: List[PreExistingCondition] = Field(
+        default_factory=list, title="Pre-existing Conditions"
+    )
+    food_intolerances: List[Intolerance] = Field(
+        default_factory=list, title="Food Intolerances"
+    )
+    dietary_preferences: List[DietaryPreference] = Field(
+        default_factory=list, title="Dietary Preferences"
+    )
