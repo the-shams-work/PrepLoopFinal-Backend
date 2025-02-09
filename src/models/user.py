@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, List, Optional, Union
 
-from pydantic import BaseModel, EmailStr, Field
+from bson import ObjectId
+from pydantic import BaseModel, EmailStr, Field, model_validator
 
 from .enums import (
     Country,
@@ -33,10 +34,14 @@ class History(BaseModel):
 
 
 class User(BaseModel):
+    mongo_id: Optional[str] = Field(
+        None, title="MongoDB ID", description="MongoDB Object ID"
+    )
+
     id: str = Field(..., title="User ID")
     first_name: str = Field(..., title="First Name", description="User's first name")
-    last_name: str = Field(
-        ..., title="Last Name", description="User's last name (surname)"
+    last_name: Optional[str] = Field(
+        None, title="Last Name", description="User's last name (surname). Optional."
     )
     email_address: EmailStr = Field(
         ..., title="Email Address", description="User's email address"
@@ -52,17 +57,28 @@ class User(BaseModel):
         ..., title="Phone Number", description="Phone number without country code"
     )
 
-    medical_data: Optional[UserMedical] = Field(..., title="Medical Data")
-    mood: Optional[MoodType] = Field(..., title="Mood")
+    medical_data: Optional[UserMedical] = Field(None, title="Medical Data")
+    mood: Optional[MoodType] = Field(None, title="Mood")
 
     exercises: List[Exercise] = Field(default_factory=list, title="Active Exercises")
-    plan: Optional["MyPlan"] = Field(..., title="Current Plan")
+    plan: Optional["MyPlan"] = Field(None, title="Current Plan")
     history: List[History] = Field(default_factory=list, title="Exercise History")
 
     created_at: datetime = Field(
         default_factory=datetime.utcnow, title="Account Creation Date"
     )
-    updated_at: Optional[datetime] = Field(..., title="Last Update Date")
+    updated_at: Optional[datetime] = Field(None, title="Last Update Date")
+
+    model_config = {
+        "populate_by_name": True,
+    }
+
+    @model_validator(mode="before")
+    @classmethod
+    def convert_object_id_to_str(cls, data: dict) -> dict:
+        if "_id" in data and isinstance(data["_id"], ObjectId):
+            data["mongo_id"] = str(data.pop("_id"))
+        return data
 
 
 class UserMedical(BaseModel):

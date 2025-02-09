@@ -10,6 +10,7 @@ __all__ = (
     "Intolerance",
     "DietaryPreference",
     "Country",
+    "MealType",
 )
 
 
@@ -67,3 +68,10 @@ class Country(Enum):
     INDIA = "India"
     USA = "USA"
     UK = "UK"
+
+
+class MealType(Enum):
+    BREAKFAST = "Breakfast"
+    LUNCH = "Lunch"
+    SNACK = "Snack"
+    DINNER = "Dinner"

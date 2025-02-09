@@ -21,12 +21,12 @@ app = FastAPI(
     description="API documentation for the MomCare project - a health and fitness application. The API is used to manage users, exercises, and plans.",
     version="0.1",
     contact={
-        "name": "Ritik Ranjan",
-        "url": "https://github.com/rtk-rnjn",
+        "name": "Team 05 - Vision",
+        "url": "https://github.com/rtk-rnjn/MomCare",
     },
     license_info={
-        "name": "MIT",
-        "url": "https://opensource.org/licenses/MIT",
+        "name": "Mozilla Public License Version 2.0",
+        "url": "https://opensource.org/licenses/MPL-2.0",
     },
 )
 

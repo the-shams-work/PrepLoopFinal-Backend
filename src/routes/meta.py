@@ -27,10 +27,14 @@ class PingResponse(BaseModel):
 
 class RootResponse(BaseModel):
     success: Literal[True] = Field(
-        True, description="Whether the request was successful. Should always be True."
+        True,
+        description="Whether the request was successful. Should always be True.",
+        frozen=True,
     )
     message: Literal["Welcome to MomCare API!"] = Field(
-        "Welcome to MomCare API!", description="A welcome message for the API."
+        "Welcome to MomCare API!",
+        description="A welcome message for the API.",
+        frozen=True,
     )
 
 

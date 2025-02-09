@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import secrets
+
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from pydantic import BaseModel, EmailStr
 from pymongo.results import InsertOneResult
 
 from src.app import app, mongo_client
@@ -25,13 +28,10 @@ class UpdateResponse(BaseModel):
 
 async def _fetch_user(*, email: str, password: str) -> User:
     collection = mongo_client["MomCare"]["users"]
-    user = await collection.find_one(
-        {"email_address": email, "password": password}, {"password": 0}
-    )
+    user = await collection.find_one({"email_address": email, "password": password})
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    user["password"] = "HIDDEN FOR SECURITY REASONS"
     return User.model_validate(user)
 
 
@@ -49,6 +49,7 @@ async def create_user(request: Request, data: User) -> CreateResponse:
     """
     Create a new user and return the inserted ID.
     """
+    print("Creating user")
     if await user_exists(email=data.email_address):
         raise HTTPException(status_code=400, detail="User already exists")
 
@@ -65,7 +66,7 @@ async def create_user(request: Request, data: User) -> CreateResponse:
     response_model=User,
     responses={404: {"description": "User not found"}, 422: {}},
 )
-async def fetch_user(request: Request, email: str, password: str) -> User:
+async def fetch_user(request: Request, email: EmailStr, password: str) -> User:
     """
     Fetch user details using email and password.
     """
@@ -82,7 +83,7 @@ async def fetch_user_by_id(request: Request, _id: str) -> User:
     Fetch user details using the user ID.
     """
     collection = mongo_client["MomCare"]["users"]
-    user = await collection.find_one({"_id": ObjectId(_id)}, {"password": 0})
+    user = await collection.find_one({"_id": ObjectId(_id)})
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -90,7 +91,7 @@ async def fetch_user_by_id(request: Request, _id: str) -> User:
 
 
 @router.put(
-    "/update",
+    "/update/{_id}",
     response_model=UpdateResponse,
     responses={
         400: {"description": "Invalid update operation"},
@@ -98,16 +99,16 @@ async def fetch_user_by_id(request: Request, _id: str) -> User:
         422: {},
     },
 )
-async def update_user(
-    request: Request, email: str, password: str, updated_user: User
-) -> UpdateResponse:
+async def update_user(request: Request, user: User) -> UpdateResponse:
     """
-    Update user details based on email and password authentication.
+    Update user details based on the user ID.
     """
+    print("Updating user")
     collection = mongo_client["MomCare"]["users"]
     try:
         result = await collection.update_one(
-            {"email_address": email, "password": password}, {"$set": dict(updated_user)}
+            {"_id": ObjectId(user.mongo_id)},
+            {"$set": user.model_dump(mode="json")},
         )
         if result.modified_count == 0:
             raise HTTPException(
