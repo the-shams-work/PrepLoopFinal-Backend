@@ -103,12 +103,14 @@ async def update_user(request: Request, user: User) -> UpdateResponse:
     """
     Update user details based on the user ID.
     """
-    print("Updating user")
     collection = mongo_client["MomCare"]["users"]
     try:
+        user_dumped = user.model_dump(mode="json")
+        user_dumped.pop("_id", None)
+
         result = await collection.update_one(
             {"_id": ObjectId(user.mongo_id)},
-            {"$set": user.model_dump(mode="json")},
+            {"$set": user_dumped},
         )
         if result.modified_count == 0:
             raise HTTPException(
