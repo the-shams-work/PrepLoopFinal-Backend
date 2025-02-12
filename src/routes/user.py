@@ -14,11 +14,6 @@ __all__ = ("create_user", "update_user", "fetch_user")
 router = APIRouter(prefix="/user", tags=["User"])
 
 
-class CreateResponse(BaseModel):
-    success: bool
-    inserted_id: str
-
-
 class UpdateResponse(BaseModel):
     success: bool
     modified_count: int
@@ -40,24 +35,20 @@ async def user_exists(*, email: str) -> bool:
 
 @router.post(
     "/create",
-    response_model=CreateResponse,
+    response_model=User,
     responses={400: {"description": "User already exists"}, 422: {}},
 )
-async def create_user(request: Request, data: User) -> CreateResponse:
-    """
-    Create a new user and return the inserted ID.
-    """
-    print("Creating user")
+async def create_user(request: Request, data: User) -> User:
     if await user_exists(email=data.email):
         raise HTTPException(status_code=400, detail="User already exists")
 
     collection = mongo_client["PrepLoop"]["users"]
     sendable_data = data.model_dump(mode="json")
-    result: InsertOneResult = await collection.insert_one(sendable_data)
+    sendable_data["_id"] = sendable_data.pop("id")
 
-    response = {"success": True, "inserted_id": str(result.inserted_id)}
-    return CreateResponse(**response)
+    await collection.insert_one(sendable_data)
 
+    return data
 
 @router.get(
     "/fetch",
@@ -81,7 +72,7 @@ async def fetch_user_by_id(request: Request, _id: str) -> User:
     Fetch user details using the user ID.
     """
     collection = mongo_client["PrepLoop"]["users"]
-    user = await collection.find_one({"_id": ObjectId(_id)})
+    user = await collection.find_one({"_id": _id})
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -90,14 +81,14 @@ async def fetch_user_by_id(request: Request, _id: str) -> User:
 
 @router.put(
     "/update/{_id}",
-    response_model=UpdateResponse,
+    response_model=User,
     responses={
         400: {"description": "Invalid update operation"},
         404: {"description": "User not found"},
         422: {},
     },
 )
-async def update_user(request: Request, user: User) -> UpdateResponse:
+async def update_user(request: Request, user: User) -> User:
     """
     Update user details based on the user ID.
     """
@@ -107,7 +98,7 @@ async def update_user(request: Request, user: User) -> UpdateResponse:
         user_dumped.pop("_id", None)
 
         result = await collection.update_one(
-            {"_id": ObjectId(user.mongo_id)},
+            {"_id": user.id},
             {"$set": user_dumped},
         )
         if result.modified_count == 0:
@@ -117,7 +108,7 @@ async def update_user(request: Request, user: User) -> UpdateResponse:
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    return UpdateResponse(success=True, modified_count=result.modified_count)
+    return user
 
 
 app.include_router(router)

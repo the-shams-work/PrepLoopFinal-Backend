@@ -5,18 +5,18 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-from .interview import Interview
+from .interview import Interview, ScheduledInterview
 from .week_plan import WeekPlan
 
 __all__ = ("User",)
 
 
 class User(BaseModel):
-    id: UUID = Field(default_factory=uuid4)
-    mongo_id: Optional[str] = Field(None, alias="_id")
+    id: UUID = Field(default_factory=uuid4, alias="_id")
     first_name: str
     last_name: Optional[str] = None
     email: str
     password: str
     history: List[Interview] = []
+    scheduled_interviews: List[ScheduledInterview] = []
     week_plan: Optional[WeekPlan] = None

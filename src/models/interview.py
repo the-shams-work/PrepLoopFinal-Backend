@@ -11,6 +11,12 @@ from .question import Question
 
 __all__ = ("Interview",)
 
+class ScheduledInterview(BaseModel):
+    id: UUID = Field(default_factory=uuid4)
+    subject: str
+    topics: List[str] = []
+    duration: float
+    date: datetime
 
 class Interview(BaseModel):
     id: UUID = Field(default_factory=uuid4)
