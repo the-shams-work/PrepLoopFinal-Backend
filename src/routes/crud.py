@@ -202,7 +202,7 @@ OPERATION_MAP = {
 
 
 async def handle_request(collection_name: str, request: Request, operation: str):
-    collection = mongo_client["MomCare"][collection_name]
+    collection = mongo_client["PrepLoop"][collection_name]
     query = await get_query_params(request)
 
     if query is None:

@@ -2,76 +2,16 @@ from __future__ import annotations
 
 from enum import Enum
 
-__all__ = (
-    "ExerciseType",
-    "MoodType",
-    "DifficultyType",
-    "PreExistingCondition",
-    "Intolerance",
-    "DietaryPreference",
-    "Country",
-    "MealType",
-)
+__all__ = ("Duration", "InterviewFlag")
 
 
-class ExerciseType(Enum):
-    BREATHING = "Breathing"
-    STRETCHING = "Stretching"
+class Duration(Enum):
+    _1week = 604800
+    _2week = 1209600
+    _3week = 1814400
+    _4week = 2419200
 
 
-class MoodType(Enum):
-    HAPPY = "Happy"
-    SAD = "Sad"
-    STRESSED = "Stressed"
-    ANGRY = "Angry"
-
-
-class DifficultyType(Enum):
-    BEGINNER = "Beginner"
-    INTERMEDIATE = "Intermediate"
-    ADVANCED = "Advanced"
-
-
-class PreExistingCondition(Enum):
-    DIABETES = "diabetes"
-    HYPERTENSION = "hypertension"
-    PCOS = "pcos"
-    ANEMIA = "anemia"
-    ASTHMA = "asthma"
-    HEART_DISEASE = "heartDisease"
-    KIDNEY_DISEASE = "kidneyDisease"
-
-
-class Intolerance(Enum):
-    GLUTEN = "gluten"
-    LACTOSE = "lactose"
-    EGG = "egg"
-    SEAFOOD = "seafood"
-    SOY = "soy"
-    DAIRY = "dairy"
-    WHEAT = "wheat"
-
-
-class DietaryPreference(Enum):
-    VEGETARIAN = "vegetarian"
-    NON_VEGETARIAN = "nonVegetarian"
-    VEGAN = "vegan"
-    PESCETARIAN = "pescetarian"
-    FLEXITARIAN = "flexitarian"
-    GLUTEN_FREE = "glutenFree"
-    KETOGENIC = "ketogenic"
-    HIGH_PROTEIN = "highProtein"
-    DAIRY_FREE = "dairyFree"
-
-
-class Country(Enum):
-    INDIA = "India"
-    USA = "USA"
-    UK = "UK"
-
-
-class MealType(Enum):
-    BREAKFAST = "Breakfast"
-    LUNCH = "Lunch"
-    SNACK = "Snack"
-    DINNER = "Dinner"
+class InterviewFlag(str, Enum):
+    GUIDED = "guided"
+    PRACTICE = "practice"

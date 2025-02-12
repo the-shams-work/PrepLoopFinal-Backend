@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import secrets
 
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel, EmailStr
 from pymongo.results import InsertOneResult
 
@@ -27,7 +25,7 @@ class UpdateResponse(BaseModel):
 
 
 async def _fetch_user(*, email: str, password: str) -> User:
-    collection = mongo_client["MomCare"]["users"]
+    collection = mongo_client["PrepLoop"]["users"]
     user = await collection.find_one({"email_address": email, "password": password})
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -36,7 +34,7 @@ async def _fetch_user(*, email: str, password: str) -> User:
 
 
 async def user_exists(*, email: str) -> bool:
-    collection = mongo_client["MomCare"]["users"]
+    collection = mongo_client["PrepLoop"]["users"]
     return await collection.count_documents({"email_address": email}) > 0
 
 
@@ -50,10 +48,10 @@ async def create_user(request: Request, data: User) -> CreateResponse:
     Create a new user and return the inserted ID.
     """
     print("Creating user")
-    if await user_exists(email=data.email_address):
+    if await user_exists(email=data.email):
         raise HTTPException(status_code=400, detail="User already exists")
 
-    collection = mongo_client["MomCare"]["users"]
+    collection = mongo_client["PrepLoop"]["users"]
     sendable_data = data.model_dump(mode="json")
     result: InsertOneResult = await collection.insert_one(sendable_data)
 
@@ -82,7 +80,7 @@ async def fetch_user_by_id(request: Request, _id: str) -> User:
     """
     Fetch user details using the user ID.
     """
-    collection = mongo_client["MomCare"]["users"]
+    collection = mongo_client["PrepLoop"]["users"]
     user = await collection.find_one({"_id": ObjectId(_id)})
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -103,7 +101,7 @@ async def update_user(request: Request, user: User) -> UpdateResponse:
     """
     Update user details based on the user ID.
     """
-    collection = mongo_client["MomCare"]["users"]
+    collection = mongo_client["PrepLoop"]["users"]
     try:
         user_dumped = user.model_dump(mode="json")
         user_dumped.pop("_id", None)

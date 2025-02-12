@@ -31,8 +31,8 @@ class RootResponse(BaseModel):
         description="Whether the request was successful. Should always be True.",
         frozen=True,
     )
-    message: Literal["Welcome to MomCare API!"] = Field(
-        "Welcome to MomCare API!",
+    message: Literal["Welcome to PrepLoop API!"] = Field(
+        "Welcome to PrepLoop API!",
         description="A welcome message for the API.",
         frozen=True,
     )
@@ -61,4 +61,4 @@ async def root() -> RootResponse:
     """
     A welcome message for the API. This endpoint is used to check if the API is running; it should always return True.
     """
-    return RootResponse(success=True, message="Welcome to MomCare API!")
+    return RootResponse(success=True, message="Welcome to PrepLoop API!")
