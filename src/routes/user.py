@@ -14,14 +14,14 @@ __all__ = ("create_user", "update_user", "fetch_user")
 router = APIRouter(prefix="/user", tags=["User"])
 
 
-class UpdateResponse(BaseModel):
-    success: bool
-    modified_count: int
+class UserCredential(BaseModel):
+    email: str
+    password: str
 
 
 async def _fetch_user(*, email: str, password: str) -> User:
     collection = mongo_client["PrepLoop"]["users"]
-    user = await collection.find_one({"email_address": email, "password": password})
+    user = await collection.find_one({"email": email, "password": password})
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -30,7 +30,7 @@ async def _fetch_user(*, email: str, password: str) -> User:
 
 async def user_exists(*, email: str) -> bool:
     collection = mongo_client["PrepLoop"]["users"]
-    return await collection.count_documents({"email_address": email}) > 0
+    return await collection.count_documents({"email": email}) > 0
 
 
 @router.post(
@@ -50,16 +50,16 @@ async def create_user(request: Request, data: User) -> User:
 
     return data
 
-@router.get(
+@router.post(
     "/fetch",
     response_model=User,
     responses={404: {"description": "User not found"}, 422: {}},
 )
-async def fetch_user(request: Request, email: EmailStr, password: str) -> User:
+async def fetch_user(request: Request, data: UserCredential):
     """
     Fetch user details using email and password.
     """
-    return await _fetch_user(email=email, password=password)
+    return await _fetch_user(email=data.email, password=data.password)
 
 
 @router.get(
