@@ -96,9 +96,8 @@ async def update_user(request: Request, user: User) -> User:
     try:
         user_dumped = user.model_dump(mode="json")
         user_dumped.pop("_id", None)
-
         result = await collection.update_one(
-            {"_id": user.id},
+            {"_id": str(user.id)},
             {"$set": user_dumped},
         )
         if result.modified_count == 0:
