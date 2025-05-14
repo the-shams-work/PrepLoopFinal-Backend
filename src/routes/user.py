@@ -154,7 +154,7 @@ async def generate_otp(request: Request, email: EmailStr) -> OTP:
     """
     otp = otp_handler.generate_otp(email=email)
     await send_email(email, f"YOUR OTP: {otp}")
-    return OTP(email=email, otp=otp)
+    return OTP(email=email)
 
 
 @router.post("/otp/validate", response_model=bool)
