@@ -1,19 +1,29 @@
 from __future__ import annotations
 
-import base64
+import random
 
-from Crypto.Cipher import PKCS1_OAEP
-from Crypto.PublicKey import RSA
-
-with open("public.pem", "rb") as f:
-    public_key = RSA.import_key(f.read())
+import lru
 
 
-def encrypt(data: str) -> str:
-    cipher = PKCS1_OAEP.new(public_key)
-    return base64.b64encode(cipher.encrypt(data.encode())).decode()
+class OTPHandler:
+    def __init__(self, cache_size: int = 2**10):
+        self.cache_size = cache_size
+        self.lru = lru.LRU(self.cache_size)
 
+    def _generate_otp(self) -> int:
+        return random.randint(100_000, 999_999)
 
-def decrypt(data: str) -> str:
-    cipher = PKCS1_OAEP.new(public_key)
-    return cipher.decrypt(base64.b64decode(data)).decode()
+    def generate_otp(self, *, email: str) -> int:
+        self.lru[email] = self._generate_otp()
+        return self.lru[email]
+
+    def validate_otp(self, *, email: str, otp: int) -> bool:
+        try:
+            self.lru[email]
+            validate = self.lru[email] == otp
+            if validate:
+                del self.lru[email]
+
+            return validate
+        except KeyError:
+            return False
