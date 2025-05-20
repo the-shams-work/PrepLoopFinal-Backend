@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from .interview import Interview, ScheduledInterview
 from .week_plan import WeekPlan
+from .learning_day import LearningDay
 
 __all__ = ("User",)
 
@@ -19,4 +20,4 @@ class User(BaseModel):
     password: str
     history: List[Interview] = []
     scheduled_interviews: List[ScheduledInterview] = []
-    week_plan: Optional[WeekPlan] = None
+    learning_days: List[LearningDay] = []
