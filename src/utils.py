@@ -68,8 +68,9 @@ class GoogleGenerativeAIHandler:
         self._temp = {}
 
     def generate_questions(
-        self, user: dict, number_of_questions: int, *selected_topics: str
+        self, number_of_questions: int, *selected_topics: str
     ) -> Optional[_Response]:
+
         try:
             return self._temp[selected_topics]
         except KeyError:
@@ -81,7 +82,6 @@ class GoogleGenerativeAIHandler:
                 contents=[
                     Content(
                         parts=[
-                            Part.from_text(text=f"User Data: {user}"),
                             Part.from_text(text=f"Prepared topics: {selected_topics}"),
                         ]
                     )
