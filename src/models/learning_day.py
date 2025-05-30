@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from pydantic import BaseModel
 from datetime import datetime
 from typing import List
+
+from pydantic import BaseModel
+
 
 class LearningDay(BaseModel):
     id: str
@@ -12,4 +14,3 @@ class LearningDay(BaseModel):
     topics: List[str]
     is_completed: bool = False
     is_current: bool = False
-

@@ -7,3 +7,4 @@ dnspython
 setuptools
 pydantic
 python-dotenv
+google-genai

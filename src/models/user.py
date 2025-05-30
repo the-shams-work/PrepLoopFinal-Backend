@@ -6,8 +6,8 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel, Field
 
 from .interview import Interview, ScheduledInterview
-from .week_plan import WeekPlan
 from .learning_day import LearningDay
+from .week_plan import WeekPlan
 
 __all__ = ("User",)
 
