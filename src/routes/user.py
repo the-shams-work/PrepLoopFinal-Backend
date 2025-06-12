@@ -158,11 +158,18 @@ async def generate_otp(request: Request, email: EmailStr) -> OTP:
 
 
 @router.post("/otp/validate", response_model=bool)
-async def validate_otp(request: Request, otp: OTP) -> bool:
+async def validate_otp(request: Request, otp: OTP):
     """
     Validate OTP given by the server
     """
-    return otp_handler.validate_otp(email=otp.email, otp=otp.otp or -1)
+    status = otp_handler.validate_otp(email=otp.email, otp=otp.otp or -1)
+    collection = mongo_client["PrepLoop"]["users"]
+    user = await collection.find_one({"email": otp.email})
+
+    if status:
+        return user
+    
+    return None
 
 
 app.include_router(router)
