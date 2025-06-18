@@ -172,4 +172,9 @@ async def validate_otp(request: Request, otp: OTP):
     return None
 
 
+@router.post("/otp/validate-only")
+async def validate_otp_only(request: Request, otp: OTP):
+    return otp_handler.validate_otp(email=otp.email, otp=otp.otp or -1)
+
+
 app.include_router(router)
