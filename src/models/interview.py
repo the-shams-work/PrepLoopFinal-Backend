@@ -31,3 +31,4 @@ class Interview(BaseModel):
     eye_contact_percentage: float = 0.0
     flag: Optional[InterviewFlag] = None
     video_url: Optional[str] = None
+    is_completed: Optional[bool] = False
