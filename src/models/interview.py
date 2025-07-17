@@ -18,6 +18,7 @@ class ScheduledInterview(BaseModel):
     topics: List[str] = []
     duration: float
     date: datetime
+    is_completed: Optional[bool] = False
 
 
 class Interview(BaseModel):
