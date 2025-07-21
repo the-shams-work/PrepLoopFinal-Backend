@@ -6,6 +6,8 @@ import random
 from typing import List, Optional
 
 import lru
+from datetime import datetime, timedelta
+
 from dotenv import load_dotenv
 from google import genai
 from google.genai.types import Content, GenerateContentConfig, Part
@@ -63,18 +65,26 @@ You are a professional Intervier with experience of 15yr, and have expertise in 
 
 
 class GoogleGenerativeAIHandler:
+    CACHE_DURATION = timedelta(minutes=10)
+
     def __init__(self):
         self.client = genai.Client(api_key=GEMINI_API_KEY)
+        # Store (response, timestamp) for each key
         self._temp = {}
 
     def generate_questions(
         self, number_of_questions: int, *selected_topics: str
     ) -> Optional[_Response]:
+        
+        current_time = datetime.utcnow()
+        cached = self._temp.get(selected_topics)
 
-        try:
-            return self._temp[selected_topics]
-        except KeyError:
-            pass
+        if cached:
+            response, timestamp = cached
+            if current_time - timestamp < self.CACHE_DURATION:
+                return response
+            else:
+                del self._temp[selected_topics]
 
         try:
             response = self.client.models.generate_content(
@@ -97,8 +107,7 @@ class GoogleGenerativeAIHandler:
 
             if response:
                 response = _Response(**json.loads(response.text or "{}"))
-                self._temp[selected_topics] = response
-
+                self._temp[selected_topics] = (response, current_time)
                 return response
 
         except Exception as e:
