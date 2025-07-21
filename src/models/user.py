@@ -20,4 +20,4 @@ class User(BaseModel):
     password: str
     history: List[Interview] = []
     scheduled_interviews: List[ScheduledInterview] = []
-    # learning_days: List[LearningDay] = []
+    learning_days: List = []
