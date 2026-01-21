@@ -88,7 +88,7 @@ class GoogleGenerativeAIHandler:
 
         try:
             response = self.client.models.generate_content(
-                model="gemini-2.0-flash-001",
+                model="gemini-2.5-flash",
                 contents=[
                     Content(
                         parts=[
