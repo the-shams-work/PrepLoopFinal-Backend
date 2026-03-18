@@ -113,6 +113,14 @@ async def fetch_user_by_id(request: Request, _id: str) -> User:
     return User.model_validate(user)
 
 
+@router.delete("/delete/{_id}")
+async def delete_user_by_id(request: Request, _id: str) -> bool:
+    """Delete user details using the user ID"""
+    collection = mongo_client["PrepLoop"]["users"]
+    await collection.delete_one({"_id": _id})
+    return True
+
+
 @router.put(
     "/update/{_id}",
     response_model=User,
