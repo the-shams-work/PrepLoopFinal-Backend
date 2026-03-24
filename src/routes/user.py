@@ -31,16 +31,85 @@ class OTP(BaseModel):
     otp: Optional[int] = None
 
 
-async def send_email(email: str, body: str):
+async def send_otp_email(email: str, otp: int) -> None:
     sender_email = MAIL
     receiver_email = email
     password = PASS
 
     message = EmailMessage()
-    message["From"] = sender_email
+
+    message["From"] = f"PrepLoop <{sender_email}>"
     message["To"] = receiver_email
-    message["Subject"] = "OTP"
-    message.set_content(body)
+    message["Subject"] = "PrepLoop Verification Code 🔐"
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <body style="margin:0; padding:0; background-color:#f2f6ff; font-family: Arial, sans-serif;">
+        
+        <div style="max-width:600px; margin:40px auto; background:white; padding:30px; border-radius:12px;">
+            
+            <!-- Branding -->
+            <h1 style="text-align:center; color:#2563eb; margin-bottom:5px;">
+                PrepLoop
+            </h1>
+            <p style="text-align:center; color:#6b7280; margin-top:0;">
+                Smart Interview Preparation
+            </p>
+
+            <!-- Title -->
+            <h2 style="text-align:center; color:#111827;">
+                Verify Your Email
+            </h2>
+
+            <!-- Message -->
+            <p style="text-align:center; color:#374151; font-size:16px;">
+                Use the OTP below to continue with <b>PrepLoop</b>.
+            </p>
+
+            <!-- OTP Box -->
+            <div style="text-align:center; margin:30px 0;">
+                <span style="
+                    display:inline-block;
+                    background:#2563eb;
+                    color:white;
+                    font-size:30px;
+                    letter-spacing:10px;
+                    padding:15px 30px;
+                    border-radius:10px;
+                    font-weight:bold;
+                ">
+                    {otp}
+                </span>
+            </div>
+
+            <!-- Info -->
+            <p style="text-align:center; color:#6b7280; font-size:14px;">
+                This OTP is valid for <b>5 minutes</b>.
+            </p>
+
+            <p style="text-align:center; color:#9ca3af; font-size:12px;">
+                Do not share this code with anyone.
+            </p>
+
+            <hr style="margin:25px 0; border:none; border-top:1px solid #e5e7eb;">
+
+            <!-- Footer -->
+            <p style="text-align:center; font-size:12px; color:#9ca3af;">
+                Didn’t request this? You can safely ignore this email.
+            </p>
+
+            <p style="text-align:center; font-size:12px; color:#d1d5db;">
+                © 2026 PrepLoop. All rights reserved.
+            </p>
+
+        </div>
+
+    </body>
+    </html>
+    """
+
+    message.add_alternative(html_content, subtype="html")
 
     await send(
         message,
@@ -161,7 +230,7 @@ async def generate_otp(request: Request, email: EmailStr) -> OTP:
     Generate OTP based on email
     """
     otp = otp_handler.generate_otp(email=email)
-    await send_email(email, f"YOUR OTP: {otp}")
+    await send_otp_email(email, otp)
     return OTP(email=email)
 
 
